@@ -11,6 +11,7 @@ import java.util.List;
 public class OVChipkaartDAOPsql implements OVChipkaartDAO
 {
     Connection conn;
+    ReizigerDAO rdao;
 
     public OVChipkaartDAOPsql(Connection conn)
     {
@@ -71,8 +72,10 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO
 
         while (rs.next())
         {
-            ovKaarten.add(new OVChipkaart(rs.getInt("kaart_nummer"), rs.getInt("klasse"), rs.getInt("reiziger_id"),
-                    rs.getDate("geldig_tot").toLocalDate(), rs.getFloat("saldo")));
+            OVChipkaart ovKaart = new OVChipkaart(rs.getInt("kaart_nummer"), rs.getInt("klasse"), rs.getInt("reiziger_id"),
+                    rs.getDate("geldig_tot").toLocalDate(), rs.getFloat("saldo"));
+            ovKaart.setReiziger(reiziger);
+            ovKaarten.add(ovKaart);
         }
 
         return ovKaarten;
@@ -88,8 +91,10 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO
 
         if (rs.next())
         {
-            return new OVChipkaart(rs.getInt("kaart_nummer"), rs.getInt("klasse"), rs.getInt("reiziger_id"),
+            OVChipkaart ovKaart =  new OVChipkaart(rs.getInt("kaart_nummer"), rs.getInt("klasse"), rs.getInt("reiziger_id"),
                     rs.getDate("geldig_tot").toLocalDate(), rs.getFloat("saldo"));
+            ovKaart.setReiziger(rdao.findByID(ovKaart.getReiziger_id()));
+            return ovKaart;
         }
 
         return null;
@@ -108,10 +113,17 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO
 
         while (rs.next())
         {
-            ovKaarten.add(new OVChipkaart(rs.getInt("kaart_nummer"), rs.getInt("klasse"), rs.getInt("reiziger_id"),
-                    rs.getDate("geldig_tot").toLocalDate(), rs.getFloat("saldo")));
+            OVChipkaart ovKaart = new OVChipkaart(rs.getInt("kaart_nummer"), rs.getInt("klasse"), rs.getInt("reiziger_id"),
+                    rs.getDate("geldig_tot").toLocalDate(), rs.getFloat("saldo"));
+            ovKaart.setReiziger(rdao.findByID(ovKaart.getReiziger_id()));
+            ovKaarten.add(ovKaart);
         }
 
         return ovKaarten;
+    }
+
+    public void setRdao(ReizigerDAO rdao)
+    {
+        this.rdao = rdao;
     }
 }

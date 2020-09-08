@@ -31,6 +31,7 @@ public class Main
             OVChipkaartDAOPsql odao = new OVChipkaartDAOPsql(connection);
             rdao.setAdao(adao);
             rdao.setOdao(odao);
+            odao.setRdao(rdao);
 
             // Traveller testing
             testReizigerDAO(rdao);
