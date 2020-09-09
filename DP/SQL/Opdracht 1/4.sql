@@ -1,3 +1,16 @@
+-- S1.4. Adressen
+--
+-- Maak een tabel `adressen`, waarin de adressen van de medewerkers worden
+-- opgeslagen (inclusief adreshistorie). De tabel bestaat uit onderstaande
+-- kolommen. Voeg minimaal één rij met adresgegevens van A DONK toe.
+--
+--    postcode      PK, bestaande uit 6 karakters (4 cijfers en 2 letters)
+--    huisnummer    PK
+--    ingangsdatum  PK
+--    einddatum     moet na de ingangsdatum liggen
+--    telefoon      10 cijfers, uniek
+--    med_mnr       FK, verplicht
+
 CREATE TABLE adressen
 (
     postcode VARCHAR(6),

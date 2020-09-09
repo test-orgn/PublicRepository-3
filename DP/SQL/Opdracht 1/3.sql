@@ -1,3 +1,13 @@
+-- S1.3. Verbetering op afdelingentabel
+--
+-- We gaan een aantal verbeteringen doorvoeren aan de tabel `afdelingen`:
+--   a) Maak een sequence die afdelingsnummers genereert. Denk aan de beperking
+--      dat afdelingsnummers veelvouden van 10 zijn.
+--   b) Voeg een aantal afdelingen toe aan de tabel, maak daarbij gebruik van
+--      de nieuwe sequence.
+--   c) Op enig moment gaat het mis. De betreffende kolommen zijn te klein voor
+--      nummers van 3 cijfers. Los dit probleem op.
+
 CREATE SEQUENCE afdelingen_anr_sequence START 10 INCREMENT 10;
 
 -- ERROR:  numeric field overflow
