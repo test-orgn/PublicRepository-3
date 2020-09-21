@@ -6,4 +6,4 @@
 -- DROP VIEW IF EXISTS s4_6; CREATE OR REPLACE VIEW s4_6 AS                                                     -- [TEST]
 
 SELECT DATE_PART('YEAR', AGE(MAX(gbdatum), MIN(gbdatum))) AS verschil, 
-AVG(DATE_PART('YEAR', AGE(NOW(), gbdatum))) AS gemiddeld
+AVG(DATE_PART('YEAR', AGE(gbdatum))) AS gemiddeld;

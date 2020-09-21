@@ -3,4 +3,4 @@
 -- DROP VIEW IF EXISTS s4_2; CREATE OR REPLACE VIEW s4_2 AS                                                     -- [TEST]
 
 SELECT naam FROM medewerkers
-WHERE (naam LIKE 'DE %' OR naam LIKE 'DEN %');
+WHERE (TRIM(naam) LIKE '% %');

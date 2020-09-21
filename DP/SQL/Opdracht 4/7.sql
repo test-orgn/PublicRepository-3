@@ -6,6 +6,5 @@
 -- DROP VIEW IF EXISTS s4_7; CREATE OR REPLACE VIEW s4_7 AS                                                     -- [TEST]
 
 SELECT COUNT(*) AS aantal_medewerkers, 
-AVG(COALESCE(comm, 0)) AS commissie_medewerkers,
-(SELECT AVG(comm) FROM medewerkers WHERE functie='VERKOPER') AS commissie_verkopers 
+AVG(COALESCE(comm, 0)) AS commissie_medewerkers, AVG(comm) AS commissie_verkopers 
 FROM medewerkers;
