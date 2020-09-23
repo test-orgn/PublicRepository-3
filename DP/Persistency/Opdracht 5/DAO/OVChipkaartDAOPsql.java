@@ -35,14 +35,7 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO
         statement.setFloat(4, ovkaart.getSaldo());
         statement.setInt(5, ovkaart.getReiziger_id());
 
-        boolean result = (statement.executeUpdate() == 1);
-
-        for(Product product : ovkaart.getProducten())
-        {
-            result = result && pdao.save(product);
-        }
-
-        return result;
+        return (statement.executeUpdate() == 1);
     }
 
     @Override
@@ -57,14 +50,7 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO
         statement.setInt(4, ovkaart.getReiziger_id());
         statement.setInt(5, ovkaart.getKaart_nummer());
 
-        boolean result = (statement.executeUpdate() == 1);
-
-        for(Product product : ovkaart.getProducten())
-        {
-            result = result && pdao.update(product);
-        }
-
-        return result;
+        return (statement.executeUpdate() == 1);
     }
 
     @Override
@@ -74,14 +60,7 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO
         PreparedStatement statement = conn.prepareStatement(SQL);
         statement.setInt(1, ovkaart.getKaart_nummer());
 
-        boolean result = (statement.executeUpdate() == 1);
-
-        for(Product product : ovkaart.getProducten())
-        {
-            result = result && pdao.delete(product);
-        }
-
-        return result;
+        return (statement.executeUpdate() == 1);
     }
 
     @Override
@@ -98,12 +77,7 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO
             OVChipkaart ovKaart = new OVChipkaart(rs.getInt("kaart_nummer"), rs.getInt("klasse"), rs.getInt("reiziger_id"),
                     rs.getDate("geldig_tot").toLocalDate(), rs.getFloat("saldo"));
             ovKaart.setReiziger(reiziger);
-
-            for(Product product : pdao.findByOVChipkaart(ovKaart))
-            {
-                ovKaart.addProduct(product);
-            }
-
+            ovKaart.setProducten(pdao.findByOVChipkaart(ovKaart));
             ovKaarten.add(ovKaart);
         }
 
@@ -123,12 +97,7 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO
             OVChipkaart ovKaart =  new OVChipkaart(rs.getInt("kaart_nummer"), rs.getInt("klasse"), rs.getInt("reiziger_id"),
                     rs.getDate("geldig_tot").toLocalDate(), rs.getFloat("saldo"));
             ovKaart.setReiziger(rdao.findByID(ovKaart.getReiziger_id()));
-
-            for(Product product : pdao.findByOVChipkaart(ovKaart))
-            {
-                ovKaart.addProduct(product);
-            }
-
+            ovKaart.setProducten(pdao.findByOVChipkaart(ovKaart));
             return ovKaart;
         }
 
@@ -151,34 +120,7 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO
             OVChipkaart ovKaart = new OVChipkaart(rs.getInt("kaart_nummer"), rs.getInt("klasse"), rs.getInt("reiziger_id"),
                     rs.getDate("geldig_tot").toLocalDate(), rs.getFloat("saldo"));
             ovKaart.setReiziger(rdao.findByID(ovKaart.getReiziger_id()));
-
-            for(Product product : pdao.findByOVChipkaart(ovKaart))
-            {
-                ovKaart.addProduct(product);
-            }
-
-            ovKaarten.add(ovKaart);
-        }
-
-        return ovKaarten;
-    }
-
-    @Override
-    public List<OVChipkaart> findByProduct(Product product) throws SQLException
-    {
-        String SQL =
-                "SELECT * FROM ov_chipkaart_product AS ocp JOIN ov_chipkaart ON ov_chipkaart.kaart_nummer=ocp.kaart_nummer WHERE product_nummer=?;";
-        PreparedStatement statement = conn.prepareStatement(SQL);
-        statement.setInt(1, product.getProduct_nummer());
-        ResultSet rs = statement.executeQuery();
-        List<OVChipkaart> ovKaarten = new ArrayList<>();
-
-        while (rs.next())
-        {
-            OVChipkaart ovKaart = new OVChipkaart(rs.getInt("kaart_nummer"), rs.getInt("klasse"), rs.getInt("reiziger_id"),
-                    rs.getDate("geldig_tot").toLocalDate(), rs.getFloat("saldo"));
-            ovKaart.setReiziger(rdao.findByID(ovKaart.getReiziger_id()));
-            ovKaart.addProduct(product);
+            ovKaart.setProducten(pdao.findByOVChipkaart(ovKaart));
             ovKaarten.add(ovKaart);
         }
 

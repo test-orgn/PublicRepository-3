@@ -22,20 +22,9 @@ public class OVChipkaart
         this.saldo = saldo;
     }
 
-    public void addProduct(Product product)
+    public void setProducten(List<Product> producten)
     {
-        if(!producten.contains(product))
-        {
-            producten.add(product);
-        }
-    }
-
-    public void removeProduct(Product product)
-    {
-        if(producten.contains(product))
-        {
-            producten.remove(product);
-        }
+        this.producten = producten;
     }
 
     public List<Product> getProducten()

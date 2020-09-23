@@ -23,10 +23,7 @@ public class ProductDAOPsql implements ProductDAO
     @Override
     public boolean save(Product product) throws SQLException
     {
-        String SQL =
-                "INSERT INTO " +
-                        "product (product_nummer, naam, beschrijving, prijs)" +
-                        "VALUES (?, ?, ?, ?)";
+        String SQL = "INSERT INTO product (product_nummer, naam, beschrijving, prijs) VALUES (?, ?, ?, ?)";
         PreparedStatement statement = conn.prepareStatement(SQL);
         statement.setInt(1, product.getProduct_nummer());
         statement.setString(2, product.getNaam());
@@ -37,7 +34,12 @@ public class ProductDAOPsql implements ProductDAO
 
         for(OVChipkaart ovKaart : product.getOvKaarten())
         {
-            result = result && odao.save(ovKaart);
+            String ovSQL = "INSERT INTO ov_chipkaart_product (kaart_nummer, product_nummer) VALUES (?, ?)";
+            PreparedStatement ovStatement = conn.prepareStatement(ovSQL);
+            ovStatement.setInt(1, ovKaart.getKaart_nummer());
+            ovStatement.setInt(2, product.getProduct_nummer());
+
+            result = result && (ovStatement.executeUpdate() == 1);
         }
 
         return result;
@@ -46,22 +48,7 @@ public class ProductDAOPsql implements ProductDAO
     @Override
     public boolean update(Product product) throws SQLException
     {
-        String SQL =
-                "UPDATE product SET naam=?, beschrijving=?, prijs=? WHERE product_nummer=?";
-        PreparedStatement statement = conn.prepareStatement(SQL);
-        statement.setString(1, product.getNaam());
-        statement.setString(2, product.getBeschrijving());
-        statement.setFloat(3, product.getPrijs());
-        statement.setInt(4, product.getProduct_nummer());
-
-        boolean result = (statement.executeUpdate() == 1);
-
-        for(OVChipkaart ovKaart : product.getOvKaarten())
-        {
-            result = result && odao.update(ovKaart);
-        }
-
-        return result;
+        return delete(product) && save(product);
     }
 
     @Override
@@ -76,7 +63,12 @@ public class ProductDAOPsql implements ProductDAO
 
         for(OVChipkaart ovKaart : product.getOvKaarten())
         {
-            result = result && odao.delete(ovKaart);
+            String ovSQL = "DELETE FROM ov_chipkaart_product WHERE kaart_nummer=? AND product_nummer=?";
+            PreparedStatement ovStatement = conn.prepareStatement(ovSQL);
+            ovStatement.setInt(1, ovKaart.getKaart_nummer());
+            ovStatement.setInt(2, product.getProduct_nummer());
+
+            result = result && (ovStatement.executeUpdate() == 1);
         }
 
         return result;
@@ -105,8 +97,7 @@ public class ProductDAOPsql implements ProductDAO
     @Override
     public List<Product> findAll() throws SQLException
     {
-        String SQL =
-                "SELECT * FROM product";
+        String SQL = "SELECT * FROM product";
         PreparedStatement statement = conn.prepareStatement(SQL);
         ResultSet rs = statement.executeQuery();
         List<Product> producten = new ArrayList<>();
@@ -115,16 +106,16 @@ public class ProductDAOPsql implements ProductDAO
         {
             Product product = new Product(rs.getInt("product_nummer"), rs.getString("naam"), rs.getString("beschrijving"), rs.getFloat("prijs"));
 
-            for(OVChipkaart ovKaart : odao.findAll())
+            String ovSQL =
+                    "SELECT * FROM ov_chipkaart_product WHERE product_nummer=?;";
+            PreparedStatement ovStatement = conn.prepareStatement(ovSQL);
+            ovStatement.setInt(1, product.getProduct_nummer());
+            ResultSet ovRS = ovStatement.executeQuery();
+            while(ovRS.next())
             {
-                for(Product p : ovKaart.getProducten())
-                {
-                    if(p.getProduct_nummer() == product.getProduct_nummer())
-                    {
-                        product.addOvKaart(ovKaart);
-                    }
-                }
+                product.addOvKaart(odao.findById(ovRS.getInt("kaart_nummer")));
             }
+
             producten.add(product);
         }
 
@@ -142,10 +133,17 @@ public class ProductDAOPsql implements ProductDAO
         if (rs.next())
         {
             Product product = new Product(rs.getInt("product_nummer"), rs.getString("naam"), rs.getString("beschrijving"), rs.getFloat("prijs"));
-            for(OVChipkaart ovKaart : odao.findByProduct(product))
+
+            String ovSQL =
+                    "SELECT * FROM ov_chipkaart_product WHERE product_nummer=?;";
+            PreparedStatement ovStatement = conn.prepareStatement(ovSQL);
+            ovStatement.setInt(1, id);
+            ResultSet ovRS = ovStatement.executeQuery();
+            while(rs.next())
             {
-                product.addOvKaart(ovKaart);
+                product.addOvKaart(odao.findById(rs.getInt("kaart_nummer")));
             }
+
             return product;
         }
 
